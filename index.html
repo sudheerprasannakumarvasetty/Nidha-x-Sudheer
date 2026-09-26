@@ -860,7 +860,18 @@ function renderAdminRows(rows) {
     const date = r.submitted_at
       ? new Date(r.submitted_at).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' })
       : '—';
-    const areas = (r.work_areas || []).join(', ') || '—';
+    let areaList = [];
+    if (Array.isArray(r.work_areas)) {
+      areaList = r.work_areas;
+    } else if (typeof r.work_areas === 'string') {
+      try {
+        const parsed = JSON.parse(r.work_areas);
+        areaList = Array.isArray(parsed) ? parsed : [r.work_areas];
+      } catch (_) {
+        areaList = r.work_areas ? [r.work_areas] : [];
+      }
+    }
+    const areas = areaList.length ? areaList.join(', ') : '—';
     const preview = r.professional_recommendation
       ? `<div class="sub-row" style="font-style:italic;color:var(--t1);">"${esc(r.professional_recommendation.slice(0,150))}${r.professional_recommendation.length>150?'…':''}"</div>`
       : '';
